@@ -1,0 +1,41 @@
+# Input topics handled/muxed.
+# For each topic:
+# - name    : name identifier to select the topic
+# - topic   : input topic of geometry_msgs::Twist type
+# - timeout : timeout in seconds to start discarding old messages, and use 0.0 speed instead
+# - priority: priority in the range [0, 255]; the higher the more priority over other topics
+
+topics:
+-
+    name    : joypad
+    topic   : pose_joy
+    timeout : 0.5
+    priority: 100
+-
+    name    : keyboard
+    topic   : pose_key
+    timeout : 0.5
+    priority: 20
+-
+    name    : control
+    topic   : pose_ctrl
+    timeout : 0.5
+    priority: 10
+    
+# Locks to stop the ackermann inputs.
+# For each lock:
+# - name    : name identifier to select the topic
+# - topic   : input topic that provides the lock; it must be of type std_msgs::Bool
+# - timeout : == 0.0 -> not used
+#              > 0.0 -> the lock is supposed to published at a certain frequency in order
+#                       to detect that the publisher is alive; the timeout in seconds allows
+#                       to detect that, and if the publisher dies, then the lock is enabled
+# - priority: priority in the range [0, 255], so all the topics with priority lower than it
+#             are stopped/disabled
+
+locks:
+-
+  name    : pause
+  topic   : /pause_motion
+  timeout : 0.5
+  priority: 100      

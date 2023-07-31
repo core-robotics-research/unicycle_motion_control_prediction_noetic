@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="pose" default="pose"/>
+    <arg name="goal" default="goal"/>
+
+    <arg name="rate" default="10"/>
+    <arg name="motion_direction" default="forward"/>   <!-- "forward" or "backward" except for circle -->
+    <arg name="resolution" default="60"/>
+    
+    <!-- Enable only one of the motion predictions -->
+    <arg name="enable_circle_motion_prediction" default="False"/>
+    <arg name="enable_boundedcone_motion_prediction" default="False"/>
+    <arg name="enable_icecreamcone_motion_prediction" default="False"/>
+    <arg name="enable_truncatedicecreamcone_motion_prediction" default="True"/>
+    
+    <group if="$(arg enable_circle_motion_prediction)">
+        <!-- Launch circular motion prediction -->
+        <node pkg="unicycle_motion_control" type="dgc_circle_motion_prediction.py" name="dgc_circular_motion_prediction" output="screen">
+
+            <param name="rate" value="$(arg rate)"/>
+            <param name="resolution" value="$(arg resolution)"/>
+
+            <remap from="pose" to="$(arg pose)"/>
+            <remap from="goal" to="$(arg goal)"/>
+        </node>
+    </group>
+
+    <group if="$(arg enable_boundedcone_motion_prediction)">
+        <!-- Launch bounded cone motion prediction -->
+        <node pkg="unicycle_motion_control" type="dgc_boundedcone_motion_prediction.py" name="dgc_boundedcone_motion_prediction" output="screen">
+
+            <param name="rate" value="$(arg rate)"/>
+            <param name="resolution" value="$(arg resolution)"/>
+            <param name="motion_direction" value="$(arg motion_direction)"/>
+    
+            <remap from="pose" to="$(arg pose)"/>
+            <remap from="goal" to="$(arg goal)"/>
+        </node>
+    </group>
+
+    <group if="$(arg enable_icecreamcone_motion_prediction)">
+        <!-- Launch ice cream cone motion prediction -->
+        <node pkg="unicycle_motion_control" type="dgc_icecreamcone_motion_prediction.py" name="dgc_icecreamcone_motion_prediction" output="screen">
+
+            <param name="rate" value="$(arg rate)"/>
+            <param name="resolution" value="$(arg resolution)"/>
+            <param name="motion_direction" value="$(arg motion_direction)"/>
+    
+            <remap from="pose" to="$(arg pose)"/>
+            <remap from="goal" to="$(arg goal)"/>
+        </node>
+    </group>
+
+    <group if="$(arg enable_truncatedicecreamcone_motion_prediction)">
+        <!-- Launch truncated ice cream cone motion prediction -->
+        <node pkg="unicycle_motion_control" type="dgc_truncatedicecreamcone_motion_prediction.py" name="dgc_truncatedicecreamcone_motion_prediction" output="screen">
+
+            <param name="rate" value="$(arg rate)"/>
+            <param name="resolution" value="$(arg resolution)"/>
+            <param name="motion_direction" value="$(arg motion_direction)"/>
+    
+            <remap from="pose" to="$(arg pose)"/>
+            <remap from="goal" to="$(arg goal)"/>
+        </node>
+    </group>
+
+</launch>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!--Gazebo Mocap Properties-->
+    <arg name="mocap_rate" default="50"/>
+    <arg name="mocap_frame" default="world"/>
+    
+    <!-- Start the gazebo mocap node -->
+    <param name="mocap/rate" value="$(arg mocap_rate)"/>
+    <param name="mocap/frame" value="$(arg mocap_frame)"/>
+    <node pkg="gazebo_mocap" type="gazebo_mocap.py" name="gazebo_mocap"  output="screen"/>
+
+</launch>

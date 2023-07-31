@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!-- Launch Gazebo Empty World -->
+    <include file="$(find simulation_tools)/launch/gazebo_empty.launch"/>
+
+    <!-- Launch RoboBox Model-->
+    <arg name="name" default="myrobobox"/>
+    <arg name="color" default="Gazebo/DarkGrey"/> <!-- see http://wiki.ros.org/simulator_gazebo/Tutorials/ListOfMaterials for Gazebo materials -->
+    <arg name="width" default = "0.15"/>
+    <arg name="length" default = "0.15"/>
+    <arg name="height" default = "0.3"/>
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+    <include file="$(find simulation_tools)/launch/robobox.launch">
+        <arg name="name" value="$(arg name)"/>
+        <arg name="color" value="$(arg color)"/>
+        <arg name="width" value="$(arg width)"/>
+        <arg name="length" value="$(arg length)"/>
+        <arg name="height" value="$(arg height)"/>
+        <arg name="x" value="$(arg x)"/>
+        <arg name="y" value="$(arg y)"/>
+        <arg name="yaw" value="$(arg yaw)"/>
+    </include>
+
+    <!-- Launch position keyboard teleoperation --> 
+    <arg name="enable_teleop_key" value="True"/>
+    <group if="$(arg enable_teleop_key)">
+        <include file="$(find pose_tools)/launch/position_teleop_key.launch" ns="$(arg name)">
+            <arg name="initial_position" value="[$(arg x), $(arg y), 0.0]"/>
+            <arg name="step_size" value="0.1"/>
+            <arg name="rate" value="10"/>
+            <arg name="launch_prefix" value="xterm -e"/>
+        </include>
+    </group> 
+
+</launch>

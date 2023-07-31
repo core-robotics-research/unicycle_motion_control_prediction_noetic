@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!-- RoboBox Model -->
+    <arg name="model" value="$(find simulation_tools)/models/robobox/model.sdf.xacro"/>
+     <arg name="enable_unicycle_model" default="false"/> <!-- set to true to enable unicycle model -->
+
+    <!-- Spawn a RoboBox -->
+    <arg name="name" default="myrobobox"/>
+    <arg name="color" default="Gazebo/Red"/>  <!-- see http://wiki.ros.org/simulator_gazebo/Tutorials/ListOfMaterials for Gazebo materials -->
+    <arg name="width" default = "0.15"/>
+    <arg name="length" default = "0.2"/>
+    <arg name="height" default = "0.3"/>
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="z" default="0.0"/>
+    <arg name="roll" default="0.0"/>
+    <arg name="pitch" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+    <!-- Laser Settings-->
+    <arg name="laser_enable"  default="true"/>
+    <arg name="laser_visualize"  default="true"/>
+    <arg name="laser_update_rate"  default="10"/>
+    <arg name="laser_samples"  default="360"/>
+    <arg name="laser_min_angle"  default="-3.1415"/>
+    <arg name="laser_max_angle"  default="3.1515"/>
+    <arg name="laser_max_range"  default="3.5"/>
+    <arg name="laser_range_resolution"  default="0.01"/>
+    <arg name="laser_noise_stddev"  default="0.01"/>
+    <arg name="laser_frame"  default="scan"/>
+    
+    <group ns="$(arg name)">
+
+        <!-- Model Description -->
+        <param name="model_description" command="$(find xacro)/xacro $(arg model) 
+            name:=$(arg name)
+            enable_unicycle_model:=$(arg enable_unicycle_model)
+            material_name:=$(arg color) 
+            width:=$(arg width) 
+            length:=$(arg length) 
+            height:=$(arg height)
+            laser_enable:=$(arg laser_enable) 
+            laser_visualize:=$(arg laser_visualize)
+            laser_update_rate:=$(arg laser_update_rate) 
+            laser_samples:=$(arg laser_samples)
+            laser_min_angle:=$(arg laser_min_angle) 
+            laser_max_angle:=$(arg laser_max_angle)
+            laser_max_range:=$(arg laser_max_range)
+            laser_range_resolution:=$(arg laser_range_resolution) 
+            laser_noise_stddev:=$(arg laser_noise_stddev)
+            laser_frame:=$(arg laser_frame)"/>
+       
+        <!-- Spawn Model -->
+        <node pkg="gazebo_ros" type="spawn_model" name="model_spawn"
+            args="-x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -sdf -model $(arg name)  -param model_description"
+            respawn="false" output="screen"/>
+
+        <!-- Model Static Transormations -->        
+        <node pkg="model_static_tf_broadcaster" type="model_static_tf_broadcaster.py" name="model_static_tf_broadcaster" output="screen"/>     
+        <node pkg="tf2_ros" type="static_transform_publisher" name="world2map" args="0 0 0 0 0 0 world $(arg name)/map"/>
+        <node pkg="tf2_ros" type="static_transform_publisher" name="map2odom" args="0 0 0 0 0 0 $(arg name)/map $(arg name)/odom"/>
+        <node pkg="tf2_ros" type="static_transform_publisher" name="base_link2base" args="0 0 0 0 0 0 $(arg name)/base_link $(arg name)/base"/>
+        <node pkg="tf2_ros" type="static_transform_publisher" name="base_scan2scan" args="0 0 0 0 0 0 $(arg name)/base_scan $(arg name)/scan"/>
+        
+    </group>
+
+    <!-- Gazebo Model Teleporter-->
+    <include file="$(find gazebo_teleport)/launch/gazebo_teleport.launch">
+        <arg name="name" value="$(arg name)"/>
+        <arg name="tf_frame" value="$(arg name)/base_footprint"/>
+        <arg name="tf_child_frame" value="$(arg name)/odom"/>
+        <arg name="tf_rate" value="50"/>
+    </include>
+
+    <!-- Pose Multiplixer -->
+    <include file="$(find pose_tools)/launch/pose_mux.launch" ns="$(arg name)"/>
+
+</launch>

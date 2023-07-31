@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="robot_name" default="myrobot"/>
+
+    <!-- Set topic names -->
+    <arg name="robot_pose" default="pose"/>
+    <arg name="governor_pose" default="governor/pose"/>
+    <arg name="map" default="map"/>
+    <arg name="path" default="path"/>
+    <arg name="motion_polygon" default="motion_polygon"/>
+
+    <arg name="rate" default="10"/>
+    <arg name="robot_radius" default="0.35"/>
+
+
+    <node pkg="governed_unicycle_navigation" type="plot_robot_governor_navigation.py" name="navigation_visualization" output="screen">
+
+        <param name="rate" value="$(arg rate)"/>
+        <param name="robot_radius" value="$(arg robot_radius)"/>
+
+        <remap from="robot_pose" to="$(arg robot_pose)"/>
+        <remap from="governor_pose" to="$(arg governor_pose)"/>
+        <remap from="map" to="$(arg map)"/>
+        <remap from="path" to="$(arg path)"/>
+        <remap from="motion_polygon" to="$(arg motion_polygon)"/>
+
+    </node>
+
+</launch>

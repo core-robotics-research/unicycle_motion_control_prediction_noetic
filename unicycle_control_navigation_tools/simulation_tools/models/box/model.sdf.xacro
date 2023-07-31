@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<sdf version="1.5" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:arg name="material_uri" default="file://media/materials/scripts/gazebo.material"/>
+    <xacro:arg name="material_name" default="Gazebo/Red"/>
+    <xacro:arg name="width" default="1.0"/>
+    <xacro:arg name="length" default="1.0"/>
+    <xacro:arg name="height" default="1.0"/>
+    <xacro:arg name="enable_collision" default="true"/>
+    <model name="visual_plane">
+        <static>true</static>
+        <pose>0 0 0 0 0 0</pose>
+        <link name="base_footprint"/>
+        <link name="base_link">
+            <pose>0 0 ${$(arg height)/2} 0 0 0</pose>
+            <xacro:if value="$(arg enable_collision)">
+                <collision name="base_collision">
+                    <geometry>
+                        <box>
+                            <size>$(arg width) $(arg length) $(arg height)</size>
+                        </box>
+                    </geometry>
+                </collision>
+            </xacro:if>
+            <visual name="base_visual">
+                <geometry>
+                    <box>
+                        <size>$(arg width) $(arg length) $(arg height)</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>
+                        <uri>$(arg material_uri)</uri>
+	                    <name>$(arg material_name)</name>
+                    </script>
+                </material>
+            </visual>
+        </link>
+        <joint name="base_joint" type="fixed">
+            <parent>base_footprint</parent>
+            <child>base_link </child>
+        </joint>
+    </model>
+</sdf>

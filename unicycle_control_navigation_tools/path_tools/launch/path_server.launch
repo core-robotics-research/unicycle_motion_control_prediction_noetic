@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<launch>
+
+
+    <arg name="path_file" default="$(find path_tools)/paths/temp_path.yaml"/>
+    <arg name="path_topic" default="path"/>
+    <arg name="map_frame" default="map"/>
+
+
+    <node pkg="path_tools" type="path_server.py" name="path_server" output="screen">
+        <param name="path_file" value="$(arg path_file)"/>
+        <param name="frame_id" value="$(arg map_frame)"/>
+
+        <remap from="path" to="$(arg path_topic)"/>
+    </node>
+
+</launch>

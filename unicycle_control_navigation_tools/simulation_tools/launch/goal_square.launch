@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!-- Goal Model -->
+     <arg name="model" value="$(find simulation_tools)/models/box/model.sdf.xacro"/>
+
+    <!-- Spawn Goal Square -->
+    <arg name="name" default="goal"/>
+    <arg name="color" default="Gazebo/Red"/>  <!-- see http://wiki.ros.org/simulator_gazebo/Tutorials/ListOfMaterials for gazebo materials-->
+    <arg name="width" default="0.3"/>
+    <arg name="length" default = "0.3"/> 
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="z" default="0.0"/>
+    <arg name="roll" default="0.0"/>
+    <arg name="pitch" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+    <group ns="$(arg name)">
+        <!-- Model Description -->
+        <param name="model_description" command="xacro $(arg model) material_name:=$(arg color) 
+        width:=$(arg width) 
+        length:=$(arg length) 
+        height:=0.0025
+        enable_collision:=false"/>
+
+        <!-- Spawn Model -->
+        <node pkg="gazebo_ros" type="spawn_model" name="goal_spawn"
+            args="-x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw) -sdf -model $(arg name)  -param model_description"
+            respawn="false" output="screen"/>
+
+        <!--Model Static Transformations-->
+        <node pkg="model_static_tf_broadcaster" type="model_static_tf_broadcaster.py" name="model_static_tf_broadcaster" output="screen"/>     
+        <node pkg="tf2_ros" type="static_transform_publisher" name="base_link2base" args="0 0 0 0 0 0 $(arg name)/base_link $(arg name)/base"/>
+            
+    </group>
+
+</launch>

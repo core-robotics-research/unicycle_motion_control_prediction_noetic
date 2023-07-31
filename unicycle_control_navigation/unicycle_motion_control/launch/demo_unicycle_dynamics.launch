@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="name" default="myrobot"/>
+
+    <arg name="motion_direction" value="bidirectional"/>  <!-- "forward", "backward", "bidirectional" -->
+
+    <!-- Launch an empty gazebo environment -->
+    <include file="$(find simulation_tools)/launch/gazebo_empty.launch"/>
+
+    <!-- Launch teleoperated goal -->
+    <include file="$(find simulation_tools)/launch/goal_position_teleop.launch">
+        <arg name="color" value="Gazebo/Blue"/>
+    </include>
+
+    <!-- Launch a pose-controlled robot -->
+    <include file="$(find simulation_tools)/launch/robocyl.launch">
+        <arg name="name" value="$(arg name)"/>
+        <arg name="laser_visualize" value="false"/>
+        <arg name="enable_unicycle_model" value="true"/>
+    </include>
+
+
+
+    <include file="$(find unicycle_motion_control)/launch/distance_gradient_control.launch" ns="$(arg name)">
+
+        <arg name="pose" value="/mocap/$(arg name)/pose"/>
+        <arg name="goal" value="/mocap/goal/pose"/>
+        <arg name="cmd_vel" value="/$(arg name)/cmd_vel"/>
+
+        <arg name="rate" value="10"/>
+        <arg name="linear_gain" value="1.0"/>
+        <arg name="angular_gain" value="1.0"/>
+        <arg name="convergence_tolerance" value="1e-3"/>
+        <arg name="motion_direction" value="$(arg motion_direction)"/>  <!-- "forward", "backward", "bidirectional" -->
+
+    </include>
+
+
+    <!-- Launch unicycle control dynamics -->
+    <include file="$(find unicycle_motion_control)/launch/unicycle_dynamics.launch" ns="$(arg name)">
+
+        <arg name="initial_pose" value="/mocap/$(arg name)/pose"/>
+        <arg name="pose" value="/$(arg name)/pose_ctrl"/>
+        <arg name="cmd_vel" value="/$(arg name)/cmd_vel"/>
+
+        <arg name="rate" value="10"/>
+        <arg name="velocity_decay" default = "0.5"/>
+
+    </include>
+
+</launch>

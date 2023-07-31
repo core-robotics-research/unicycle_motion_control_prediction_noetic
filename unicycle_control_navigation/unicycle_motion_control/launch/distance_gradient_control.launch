@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="pose" default="pose"/>
+    <arg name="goal" default="goal"/>
+    <arg name="cmd_vel" default="cmd_vel"/>
+
+    <arg name="rate" default="10"/>
+    <arg name="linear_gain" default="1.0"/>
+    <arg name="angular_gain" default="1.0"/>
+    <arg name="convergence_tolerance" default="1e-3"/>
+    <arg name="motion_direction" default="bidirectional"/>  <!-- "forward", "backward", "bidirectional" -->
+    
+    <node pkg="unicycle_motion_control" type="distance_gradient_control.py" name="distance_gradient_control" output="screen">
+        <param name="rate" value="$(arg rate)"/>
+        <param name="linear_gain" value="$(arg linear_gain)"/>
+        <param name="angular_gain" value="$(arg angular_gain)"/>
+        <param name="convergence_tolerance" value="$(arg convergence_tolerance)"/>
+        <param name="motion_direction" value="$(arg motion_direction)"/>
+
+        <remap from="pose" to="$(arg pose)"/>
+        <remap from="goal" to="$(arg goal)"/>
+        <remap from="cmd_vel" to="$(arg cmd_vel)"/>
+    </node>
+
+</launch>

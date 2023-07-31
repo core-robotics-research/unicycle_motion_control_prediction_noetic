@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Launch Gazebo Stage 1 Environment -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find simulation_tools)/worlds/office_environment.world"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include>  
+
+    <!-- Launch gazebo mocap -->
+    <arg name="mocap_rate" default="50" />
+    <include file="$(find gazebo_mocap)/launch/gazebo_mocap.launch">
+        <arg name="mocap_rate" value="$(arg mocap_rate)"/>
+    </include>
+
+</launch>

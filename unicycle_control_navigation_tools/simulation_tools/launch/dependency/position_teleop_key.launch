@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- Launch 3D position teleoperation with keyboard -->
+    <arg name="initial_position" default="[0.0, 0.0, 0.0]"/>
+    <arg name="step_size" default="0.1"/>
+    <arg name="rate" default="10"/>
+    <arg name="launch_prefix" default="xterm -e"/>
+    <arg name="pose" default="pose"/>
+    <arg name="initial_pose" default="_initial_pose"/>
+    <include file="$(find pose_tools)/launch/position_teleop_key.launch">
+        <arg name="initial_position" value="$(arg initial_position)"/>
+        <arg name="step_size" value="$(arg step_size)"/>
+        <arg name="rate" value="$(arg rate)"/>
+        <arg name="pose" value="$(arg pose)"/>
+        <arg name="initial_pose" value="$(arg initial_pose)"/>
+    </include>
+
+</launch>

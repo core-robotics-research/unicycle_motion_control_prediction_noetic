@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="name" default="myrobot"/>
+
+    <arg name="rate" default="10"/>
+    <arg name="linear_gain" default="1.0"/>
+    <arg name="angular_gain" default="1.0"/>
+    <arg name="convergence_tolerance" default="1e-3"/>
+    <arg name="motion_direction" default="bidirectional"/>  <!-- "forward" or "backward" -->
+    
+    <arg name="resolution" default="60"/>
+    
+    <!-- !!!Enable only one of the motion predictions!!! -->
+    <arg name="enable_circle_motion_prediction" default="True"/>
+    <arg name="enable_boundedcone_motion_prediction" default="False"/> 
+    <arg name="enable_icecreamcone_motion_prediction" default="False"/> 
+    <arg name="enable_truncatedicecreamcone_motion_prediction" default="False"/>
+
+
+
+    <!-- Launch an empty gazebo environment -->
+    <include file="$(find simulation_tools)/launch/gazebo_empty.launch"/>
+
+
+
+    <!-- Launch teleoperated goal -->
+    <include file="$(find simulation_tools)/launch/goal_position_teleop.launch">
+        <arg name="color" value="Gazebo/Blue"/>
+    </include>
+
+
+
+    <!-- Launch a pose-controlled robot -->
+    <include file="$(find simulation_tools)/launch/robocyl.launch">
+        <arg name="name" value="$(arg name)"/>
+        <arg name="laser_visualize" value="false"/>
+        <arg name="enable_unicycle_model" value="true"/>
+    </include>
+
+
+
+    <!-- Launch motion prediction -->
+    <include file="$(find unicycle_motion_control)/launch/dgc_motion_prediction.launch" ns="$(arg name)">
+        <arg name="pose" value="/mocap/$(arg name)/pose"/>
+        <arg name="goal" value="/mocap/goal/pose"/>
+
+        <arg name="rate" value="$(arg rate)"/>
+        <arg name="motion_direction" value="$(arg motion_direction)"/> 
+        <arg name="resolution" value="$(arg resolution)"/>
+
+        <arg name="enable_circle_motion_prediction" value="$(arg enable_circle_motion_prediction)"/>
+        <arg name="enable_boundedcone_motion_prediction" value="$(arg enable_boundedcone_motion_prediction)"/>
+        <arg name="enable_icecreamcone_motion_prediction" value="$(arg enable_icecreamcone_motion_prediction)"/>
+        <arg name="enable_truncatedicecreamcone_motion_prediction" value="$(arg enable_truncatedicecreamcone_motion_prediction)"/>
+    </include>
+
+
+
+    <!-- Launch RViz visualization of motion prediction-->
+    <arg name="fixed_frame" default="$(arg name)/base"/> 
+    <arg name="rviz_file" default="$(find unicycle_motion_control)/rviz/motion_prediction.rviz"/>
+	<node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(arg rviz_file) -f $(arg fixed_frame)">
+    </node>
+
+</launch>

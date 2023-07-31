@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!-- Launch Goal Square -->
+    <arg name="name" default="goal"/>
+    <arg name="color" default="Gazebo/Red"/>  <!-- see http://wiki.ros.org/simulator_gazebo/Tutorials/ListOfMaterials for gazebo materials-->
+    <arg name="width" default="0.3"/>
+    <arg name="length" default = "0.3"/> 
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="z" default="0.0"/>
+    <arg name="roll" default="0.0"/>
+    <arg name="pitch" default="0.0"/>
+    <arg name="yaw" default="0.0"/>
+    <include file="$(find simulation_tools)/launch/goal_square.launch">
+        <arg name="name" value="$(arg name)"/>
+        <arg name="color" value="$(arg color)"/>
+        <arg name="width" value="$(arg width)"/>
+        <arg name="length" value="$(arg length)"/>        
+        <arg name="x" value="$(arg x)"/>
+        <arg name="y" value="$(arg y)"/>
+        <arg name="z" value="$(arg z)"/>
+        <arg name="roll" value="$(arg roll)"/>
+        <arg name="pitch" value="$(arg pitch)"/>
+        <arg name="yaw" value="$(arg yaw)"/>
+    </include>
+
+    <!-- Launch goal gazebo teleporter -->
+    <include file="$(find simulation_tools)/launch/dependency/gazebo_teleport.launch">
+        <arg name="name" value="$(arg name)"/>
+    </include>
+  
+    <!-- Launch position teleoperation with keyboard-->
+    <include file="$(find simulation_tools)/launch/dependency/position_teleop_key.launch" ns="$(arg name)">
+        <arg name="initial_pose" value="/mocap/$(arg name)/pose"/>
+    </include>  
+
+</launch>

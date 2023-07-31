@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="name" default="myrobot"/>
+
+    <!-- Launch an empty gazebo environment -->
+    <arg name="mocap_rate" default="50"/>
+    <include file="$(find simulation_tools)/launch/gazebo_empty.launch">
+        <arg name="mocap_rate" value="$(arg mocap_rate)"/>
+    </include>
+
+    <!-- Launch teleoperated goal -->
+    <include file="$(find simulation_tools)/launch/goal_position_teleop.launch">
+        <arg name="color" value="Gazebo/Blue"/>
+    </include>
+
+</launch>

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!-- Start pose multiplexer -->
+    <arg name="config"  default="$(find pose_tools)/config/pose_mux.yaml"/>
+    <arg name="pose" default="pose"/>
+    <node pkg="pose_tools" type="pose_mux.py" name="pose_mux" output="screen">
+        <rosparam file="$(arg config)" command="load"/>
+        <remap from="pose" to="$(arg pose)"/> 
+    </node>
+
+</launch>

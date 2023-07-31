@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!-- Launch the gazebo model teleporter -->
+    <arg name="name" default="myrobot"/>
+    <arg name="tf_frame" default="$(arg name)/base_footprint"/>
+    <arg name="tf_child_frame" default="$(arg name)/map"/>
+    <arg name="tf_rate" default="50"/>
+    <include file="$(find gazebo_teleport)/launch/gazebo_teleport.launch">
+        <arg name="name" value="$(arg name)"/>
+        <arg name="tf_frame" value="$(arg tf_frame)"/>
+        <arg name="tf_child_frame" value="$(arg tf_child_frame)"/>
+        <arg name="tf_rate" value="$(arg tf_rate)"/>
+    </include>
+
+</launch>

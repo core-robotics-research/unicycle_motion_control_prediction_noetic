@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+
+<launch>
+    <arg name="robot_name" default="myrobot"/>
+
+    <!-- Set topic names -->
+    <arg name="robot_pose" default="pose"/>
+    <arg name="governor_pose" default="governor/pose"/>
+    <arg name="map" default="map"/>
+    <arg name="path" default="path"/>
+    <arg name="motion_polygon" default="motion_polygon"/>
+
+    <arg name="rate" default="10"/>
+    <arg name="governor_gain" default="1.0"/>
+    <arg name="robot_radius" default="0.35"/>
+    <arg name="max_integration_step" default="0.005"/> 
+
+    <arg name="convergence_tolerance" default="1e-3"/>
+    <arg name="motion_direction" default="Bidirectional"/>  <!-- "Bidirectional", "Forward", "Backward" -->
+
+    <arg name="control_method" default="distance_gradient_control"/>     <!-- "distance_gradient_control", "adaptive_headway_control" -->
+    <!-- distance_gradient_control parameters -->
+    <arg name="linear_gain" default="1.0"/>
+    <arg name="angular_gain" default="1.0"/>
+
+    <arg name="motion_prediction_method" default="circle"/>  <!-- distance_gradient_control: "circle", "bounded_cone", "icecream_cone", "truncatedicecream_cone" ||| adaptive_headway_control: "circle", "triangle" -->
+    <arg name="motion_prediction_resolution" default="60"/>
+
+
+    <node pkg="governed_unicycle_navigation" type="governed_navigation.py" name="reference_governor" output="screen">
+
+        <param name="rate" value="$(arg rate)"/>
+        <param name="governor_gain" value="$(arg governor_gain)"/>
+        <param name="robot_radius" value="$(arg robot_radius)"/>
+        <param name="max_integration_step" value="$(arg max_integration_step)"/>
+
+        <param name="convergence_tolerance" value="$(arg convergence_tolerance)"/>
+        <param name="motion_direction" value="$(arg motion_direction)"/>
+
+        <param name="control_method" value="$(arg control_method)"/>
+        <!-- distance_gradient_control parameters -->
+        <param name="linear_gain" value="$(arg linear_gain)"/>
+        <param name="angular_gain" value="$(arg angular_gain)"/>
+
+        <param name="motion_prediction_method" value="$(arg motion_prediction_method)"/>
+        <param name="motion_prediction_resolution" value="$(arg motion_prediction_resolution)"/>
+
+        <remap from="robot_pose" to="$(arg robot_pose)"/>
+        <remap from="governor_pose" to="$(arg governor_pose)"/>
+        <remap from="map" to="$(arg map)"/>
+        <remap from="path" to="$(arg path)"/>
+        <remap from="motion_polygon" to="$(arg motion_polygon)"/>
+
+    </node>
+
+</launch>

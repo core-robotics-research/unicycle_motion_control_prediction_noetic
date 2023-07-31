@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <!--Gazebo Teleport Properties-->
+    <arg name="name" default="myrobot"/>
+    <arg name="tf_frame" default="$(arg name)/base_footprint"/>
+    <arg name="tf_child_frame" default="$(arg name)/map"/>
+    <arg name="tf_rate" default="50"/>
+    
+    <!-- Start the gazebo teleport node -->
+    <node pkg="gazebo_teleport" type="gazebo_teleport.py" name="gazebo_teleport" ns="$(arg name)" output="screen">
+        <param name="name"    value="$(arg name)"/>
+        <param name="tf_frame"    value="$(arg tf_frame)"/>
+        <param name="tf_child_frame"     value="$(arg tf_child_frame)"/>
+        <param name="tf_rate"          value="$(arg tf_rate)"/>
+    </node>
+
+</launch>

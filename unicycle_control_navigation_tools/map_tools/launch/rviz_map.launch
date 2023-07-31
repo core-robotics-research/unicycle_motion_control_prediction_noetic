@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+
+<launch>
+    <!-- Launch rviz for visualizing OGM -->
+    <arg name="robot_name" default="myrobot"/>
+    <arg name='fixed_frame' default="world"/>
+    <arg name="scan_topic" default="$(arg robot_name)/scan"/>
+    <arg name="map_topic" default="$(arg robot_name)/map"/>
+    <arg name="pose_topic" default="mocap/$(arg robot_name)/pose"/>
+    <arg name="rviz_file" default="$(find map_tools)/rviz/ogm.rviz"/>
+
+	<node pkg="rviz" type="rviz" name="rviz" required="true" args="-d $(arg rviz_file) -f $(arg fixed_frame)">
+        <remap from="scan" to="$(arg scan_topic)"/>
+        <remap from="map" to="$(arg map_topic)"/>
+        <remap from="/mocap/robot_name/pose" to="$(arg pose_topic)"/>
+    </node>
+</launch>

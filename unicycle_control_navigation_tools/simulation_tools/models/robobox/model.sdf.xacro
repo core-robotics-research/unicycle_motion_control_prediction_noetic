@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+<sdf version="1.5" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    
+    <!--Model Pose & Shape Settings-->
+    <xacro:arg name="name" default="robobox"/>
+    <xacro:arg name="height" default="0.3"/>
+    <xacro:arg name="length" default="0.15"/>
+    <xacro:arg name="width" default="0.15"/>
+    <xacro:arg name="material_uri" default="file://media/materials/scripts/gazebo.material"/>
+    <xacro:arg name="material_name" default="Gazebo/Red"/>
+    <xacro:arg name="enable_unicycle_model" default="False"/>
+
+    <!-- Laser Settings-->
+    <xacro:arg name="laser_enable"  default="true"/>
+    <xacro:arg name="laser_visualize"  default="true"/>
+    <xacro:arg name="laser_update_rate"  default="10"/>
+    <xacro:arg name="laser_samples"  default="360"/>
+    <xacro:arg name="laser_min_angle"  default="-3.1415"/>
+    <xacro:arg name="laser_max_angle"  default="3.1515"/>
+    <xacro:arg name="laser_max_range"  default="3.5"/>
+    <xacro:arg name="laser_range_resolution"  default="0.01"/>
+    <xacro:arg name="laser_noise_stddev"  default="0.01"/>
+    <xacro:arg name="laser_frame"  default="base_scan"/>
+    
+    <model name="robobox">
+        <static>true</static>
+        <pose>0 0 0 0 0 0</pose>
+
+        <link name="base_footprint"/>
+        
+        <link name="base_link">
+            <pose>0 0 ${$(arg height)/2} 0 0 0</pose>
+            <collision name="base_collision">
+                <geometry>
+                    <box>
+                        <size>$(arg width)  $(arg length) $(arg height)</size>
+                    </box>
+                </geometry>
+            </collision>
+            <visual name="base_visual">
+                <geometry>
+                    <box>
+                        <size>$(arg width)  $(arg length) $(arg height)</size>
+                    </box>
+                </geometry>
+                <material>
+                    <script>
+                        <uri>$(arg material_uri)</uri>
+	                    <name>$(arg material_name)</name>
+                    </script>
+                </material>
+            </visual>
+        </link>
+
+        <link name="base_scan"> 
+            <pose>0 0 ${$(arg height)/2} 0 0 0</pose>
+            <xacro:if value="$(arg laser_enable)">
+                <sensor type="ray" name="laser">
+                    <always_on>true</always_on>
+                    <update_rate>$(arg laser_update_rate)</update_rate>
+                    <visualize>$(arg laser_visualize)</visualize>
+                    <ray>
+                        <scan>
+                            <horizontal>
+                                <samples>$(arg laser_samples)</samples>
+                                <resolution>1</resolution>
+                                <min_angle>$(arg laser_min_angle)</min_angle>
+                                <max_angle>$(arg laser_max_angle)</max_angle>
+                            </horizontal>
+                        </scan>
+                        <range>
+                            <min>${sqrt(pow($(arg width)/2,2) + pow($(arg length)/2,2)) + 0.001}</min>
+                            <max>$(arg laser_max_range)</max>
+                            <resolution>$(arg laser_range_resolution)</resolution>
+                        </range>
+                        <noise>
+                            <type>gaussian</type>
+                            <mean>0.0</mean>
+                            <stddev>$(arg laser_noise_stddev)</stddev>
+                        </noise>
+                    </ray>
+                    <plugin name="gazebo_ros_laser" filename="libgazebo_ros_laser.so">
+                        <topicName>scan</topicName>
+                        <frameName>$(arg name)/$(arg laser_frame)</frameName>
+                    </plugin>
+                </sensor>
+            </xacro:if>    
+        </link>
+
+        <joint name="base_joint" type="fixed">
+            <parent>base_footprint</parent>
+            <child>base_link</child>
+        </joint>
+
+        <joint name="scan_joint" type="fixed">
+            <parent>base_link</parent>
+            <child>base_scan</child>
+        </joint>
+
+        <xacro:if value="$(arg enable_unicycle_model)">
+
+            <xacro:arg name="wheel_material_name" default="Gazebo/Blue"/>
+            <link name="wheel_right_link">
+                <pose>0.0 ${$(arg width)/2-$(arg width)/7.9} $(arg height) 0.0 0.0 0.0</pose>
+                <visual name="wheel_right_visual">
+                    <geometry>
+                        <box>
+                            <size>${$(arg length)/1.05} ${$(arg width)/4} ${$(arg height)/100}</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>
+                            <uri>$(arg material_uri)</uri>
+                            <name>$(arg wheel_material_name)</name>
+                        </script>
+                    </material>
+                </visual>
+            </link>
+
+            <link name="wheel_left_link">
+                <pose>0.0 ${-$(arg width)/2+$(arg width)/7.9} $(arg height) 0.0 0.0 0.0</pose>
+                <visual name="wheel_left_visual">
+                    <geometry>
+                        <box>
+                            <size>${$(arg length)/1.05} ${$(arg width)/4} ${$(arg height)/100}</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>
+                            <uri>$(arg material_uri)</uri>
+                            <name>$(arg wheel_material_name)</name>
+                        </script>
+                    </material>
+                </visual>
+            </link>
+
+            <link name="direction_visual_link">
+                <pose>${$(arg length)/4} 0.0 $(arg height) 0.0 0.0 0.0</pose>
+                <visual name="direction_visual">
+                    <geometry>
+                        <box>
+                            <size>${$(arg length)/2} ${$(arg width)/6} ${$(arg height)/100}</size>
+                        </box>
+                    </geometry>
+                    <material>
+                        <script>
+                            <uri>$(arg material_uri)</uri>
+                            <name>$(arg wheel_material_name)</name>
+                        </script>
+                    </material>
+                </visual>
+            </link>
+
+
+            <joint name="wheel_right_joint" type="fixed">
+                <parent>base_link</parent>
+                <child>wheel_right_link</child>
+            </joint>
+
+            <joint name="wheel_left_joint" type="fixed">
+                <parent>base_link</parent>
+                <child>wheel_left_link</child>
+            </joint>
+
+            <joint name="direction_visual_joint" type="fixed">
+                <parent>base_link</parent>
+                <child>direction_visual_link</child>
+            </joint>
+
+        </xacro:if>   
+
+    </model>
+</sdf>
+

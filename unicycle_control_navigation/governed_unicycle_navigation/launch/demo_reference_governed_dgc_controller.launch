@@ -1,0 +1,144 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="robot_name" default="myrobot"/>
+    <arg name="robot_initial_x" default="3"/>
+    <arg name="robot_initial_y" default="9"/>
+    <arg name="robot_initial_yaw" default="-1.57"/>
+
+
+    <arg name="rate" default="10"/>
+    <arg name="governor_gain" default="5.0"/>
+    <arg name="robot_radius" default="0.35"/>
+    <arg name="max_integration_step" default="0.05"/> 
+    <arg name="convergence_tolerance" default="0.05"/>
+    <arg name="motion_direction" default="Forward"/>  <!-- "Bidirectional", "Forward", "Backward" -->    
+
+    <arg name="control_method" default="distance_gradient_control"/>     <!-- "distance_gradient_control" -->
+    <!-- distance_gradient_control parameters -->
+    <arg name="linear_gain" default="1.0"/>
+    <arg name="angular_gain" default="2"/>
+
+    <arg name="motion_prediction_method" default="icecream_cone"/>  <!-- distance_gradient_control: "circle", "bounded_cone", "icecream_cone", "truncatedicecream_cone" -->
+    <arg name="motion_prediction_resolution" default="60"/>
+
+
+
+
+    <!-- Launch a office-like gazebo environment -->
+    <include file="$(find simulation_tools)/launch/gazebo_office_environment.launch">
+    </include>
+
+    <!-- Launch the previously explored map -->
+    <include file="$(find map_tools)/launch/map_server.launch">
+        <arg name="map_file" default="$(find map_tools)/maps/office_environment/office_environment.yaml"/>
+        <arg name="map_topic" default="$(arg robot_name)/map"/>
+        <arg name="frame_id" default="$(arg robot_name)/map"/>
+    </include>
+
+
+    <!-- Launch the user defined path -->
+    <arg name="path_file" default="$(find map_tools)/maps/office_environment/office_environment_path.yaml"/>
+    <include file="$(find path_tools)/launch/path_server.launch">
+        <arg name="path_file" value="$(arg path_file)"/>
+        <arg name="path_topic" value="$(arg robot_name)/path"/>
+        <arg name="map_frame" value="$(arg robot_name)/map"/>
+    </include>
+
+
+    <!-- Launch rviz -->
+    <!-- <include file="$(find map_tools)/launch/rviz_map.launch">
+        <arg name="robot_name" value="$(arg robot_name)"/>
+    </include> -->
+
+
+    <!-- Launch a pose-controlled robot -->
+    <include file="$(find simulation_tools)/launch/robocyl.launch">
+        <arg name="name" value="$(arg robot_name)"/>
+        <arg name="laser_visualize" value="false"/>
+        <arg name="enable_unicycle_model" value="true"/>
+
+        <arg name="radius" value="$(arg robot_radius)"/>
+        <arg name="height" value="0.5"/>
+        <arg name="x" value="$(arg robot_initial_x)"/>
+        <arg name="y" value="$(arg robot_initial_y)"/>
+        <arg name="yaw" value="$(arg robot_initial_yaw)"/>
+    </include>
+
+
+    <!-- Launch the reference governed navigation -->
+    <include file="$(find governed_unicycle_navigation)/launch/governed_navigation.launch" ns="$(arg robot_name)">
+
+        <arg name="robot_name" default="$(arg robot_name)"/>
+        <arg name="robot_pose" value="/mocap/$(arg robot_name)/pose"/>
+        <arg name="governor_pose" default="/$(arg robot_name)/governor/pose"/>
+        <arg name="map" default="/$(arg robot_name)/map"/>
+        <arg name="path" default="/$(arg robot_name)/path"/>
+        <arg name="motion_polygon" default="/$(arg robot_name)/motion_polygon"/>
+
+        <arg name="rate" value="$(arg rate)"/>
+        <arg name="governor_gain" value="$(arg governor_gain)"/>
+        <arg name="robot_radius" value="$(arg robot_radius)"/>
+        <arg name="max_integration_step" value="$(arg max_integration_step)"/>
+        <arg name="convergence_tolerance" value="$(arg convergence_tolerance)"/>
+        <arg name="motion_direction" value="$(arg motion_direction)"/>
+
+        <arg name="control_method" value="$(arg control_method)"/>
+        <!-- distance_gradient_control parameters -->
+        <arg name="linear_gain" default="$(arg linear_gain)"/>
+        <arg name="angular_gain" default="$(arg angular_gain)"/>
+
+
+        <arg name="motion_prediction_method" default="$(arg motion_prediction_method)"/>
+        <arg name="motion_prediction_resolution" default="$(arg motion_prediction_resolution)"/>
+
+    </include>
+
+
+
+    <!-- Launch unicycle controller -->
+    <include file="$(find unicycle_motion_control)/launch/distance_gradient_control.launch" ns="$(arg robot_name)">
+
+        <arg name="pose" value="/mocap/$(arg robot_name)/pose"/>
+        <arg name="goal" value="/$(arg robot_name)/governor/pose"/>
+        <arg name="cmd_vel" value="/$(arg robot_name)/cmd_vel"/>
+
+        <arg name="rate" value="$(arg rate)"/>
+        <arg name="linear_gain" default="$(arg linear_gain)"/>
+        <arg name="angular_gain" default="$(arg angular_gain)"/>
+        <arg name="convergence_tolerance" value="$(arg convergence_tolerance)"/>
+        <arg name="motion_direction" value="$(arg motion_direction)"/> 
+
+    </include>
+
+
+    <!-- Launch unicycle control dynamics -->
+    <include file="$(find unicycle_motion_control)/launch/unicycle_dynamics.launch" ns="$(arg robot_name)">
+
+        <arg name="initial_pose" value="/mocap/$(arg robot_name)/pose"/>
+        <arg name="pose" value="/$(arg robot_name)/pose_ctrl"/>
+        <arg name="cmd_vel" value="/$(arg robot_name)/cmd_vel"/>
+
+        <arg name="rate" value="$(arg rate)"/>
+        <arg name="velocity_decay" default = "0.5"/>
+
+    </include>
+
+    <!-- Launch visualization of the robot-governor navigation -->
+    <include file="$(find governed_unicycle_navigation)/launch/plot_robot_governor_navigation.launch" ns="$(arg robot_name)">
+
+        <arg name="robot_pose" value="/mocap/$(arg robot_name)/pose"/>
+        <arg name="governor_pose" default="/$(arg robot_name)/governor/pose"/>
+        <arg name="map" default="/$(arg robot_name)/map"/>
+        <arg name="path" default="/$(arg robot_name)/path"/>
+        <arg name="motion_polygon" default="/$(arg robot_name)/motion_polygon"/>
+
+        <arg name="rate" value="$(arg rate)"/>
+        <arg name="robot_radius" value="$(arg robot_radius)"/>
+
+    </include>
+
+
+
+</launch>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="initial_position" default="[0.0, 0.0, 0.0]"/>
+    <arg name="step_size" default="0.1"/>
+    <arg name="rate" default="10"/>
+    <arg name="launch_prefix" default="xterm -e"/>
+    <arg name="pose" default="pose"/>
+    <arg name="initial_pose" default="initial_pose"/>
+    <node pkg="pose_tools" type="position_teleop_key.py" name="position_teleop_key" output="screen" launch-prefix="$(arg launch_prefix)">
+        <param name="initial_position" value="$(arg initial_position)"/>
+        <param name="step_size" value="$(arg step_size)"/>
+        <param name="rate" value="$(arg rate)"/>
+        <remap from="pose" to="$(arg pose)"/>
+        <remap from="initial_pose" to="$(arg initial_pose)"/>
+    </node>
+
+</launch>

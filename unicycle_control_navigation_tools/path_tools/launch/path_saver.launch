@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch>
+
+    <arg name="path_file" default="$(find path_tools)/paths/temp_path.yaml"/>
+    <arg name="path_topic" default="path"/>
+    <node pkg="path_tools" type="path_saver.py" name="path_saver" output="screen">
+        <param name="path_file" value="$(arg path_file)"/>
+        <remap from="path" to="$(arg path_topic)"/>
+    </node>
+
+</launch>
